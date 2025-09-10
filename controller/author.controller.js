@@ -31,7 +31,8 @@ export async function getAuthorByID(req, res) {
 }
 
 export async function addAuthor(req, res) {
-    const { firstName, lastName, email } = req.body;
+    try {
+        const { firstName, lastName, email } = req.body;
 
     if (!firstName || firstName === "") {
         return res.status(400).json({ error: 'First Name is required' });
@@ -50,6 +51,11 @@ export async function addAuthor(req, res) {
         .returning({ id: authorsTable.id })
     return res.status(201).json({ message: 'Author added successfully', result });
 
+        
+    } catch (error) {
+        res.status(500).json({ message: "server error" });
+    }
+    
 }
 
 // export async function DeleteAuthor(req, res) {
