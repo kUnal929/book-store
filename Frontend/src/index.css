@@ -1,10 +1,22 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --color-primary: #FFA07A;
   --color-primary-dark: #ff8c5a;
   --color-background: #FAFAFA;
   --color-text-main: #333333;
+}
+
+:root {
+  --color-background: #FAFAFA;
+  --color-text-main: #333333;
+}
+
+.dark {
+  --color-background: #0f1115;
+  --color-text-main: #f3f4f6;
 }
 
 body {
@@ -13,4 +25,5 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   margin: 0;
   padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }

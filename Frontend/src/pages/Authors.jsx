@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchAuthors, createAuthor, deleteAuthor, updateAuthor } from '../api';
-import { Plus, Trash2, Edit2, X, Mail } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Mail, Users } from 'lucide-react';
 
 export default function Authors() {
   const [authors, setAuthors] = useState([]);
@@ -75,61 +75,64 @@ export default function Authors() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-medium text-gray-900">Authors Directory</h1>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10 border-b border-gray-200 dark:border-gray-800 pb-6">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">Authors Directory</h1>
+          <p className="text-lg text-gray-500 dark:text-gray-400">Manage the creators behind your collection.</p>
+        </div>
         <button
           onClick={() => openModal()}
-          className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-md transition-colors shadow-sm"
+          className="inline-flex items-center justify-center px-6 py-3.5 bg-primary hover:bg-primary-dark text-white text-base font-semibold rounded-xl transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Author
+          <Plus className="w-5 h-5 mr-2" strokeWidth={2.5} />
+          Add New Author
         </button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="bg-white dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+        <table className="min-w-full divide-y-2 divide-gray-100 dark:divide-gray-800">
+          <thead className="bg-gray-50/80 dark:bg-gray-800/50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
+              <th scope="col" className="px-8 py-5 text-left text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                Full Name
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
+              <th scope="col" className="px-8 py-5 text-left text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                Email Address
               </th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-8 py-5 text-right text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-100 dark:divide-gray-800">
             {authors.map((author) => (
-              <tr key={author.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
+              <tr key={author.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <div className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">
                     {author.firstName} {author.lastName}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                <td className="px-8 py-6 whitespace-nowrap">
+                  <div className="flex items-center text-base text-gray-600 dark:text-gray-400">
+                    <Mail className="w-5 h-5 mr-3 text-gray-400 dark:text-gray-500" />
                     {author.email}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end gap-2">
+                <td className="px-8 py-6 whitespace-nowrap text-right">
+                  <div className="flex justify-end gap-3 opacity-80 group-hover:opacity-100 transition-opacity">
                     <button 
                       onClick={() => openModal(author)}
-                      className="p-1.5 text-gray-400 hover:text-gray-700 transition-colors rounded-md hover:bg-gray-200"
-                      title="Edit"
+                      className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors rounded-xl hover:bg-primary/10 dark:hover:bg-primary/20"
+                      title="Edit Author"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="w-5 h-5" />
                     </button>
                     <button 
                       onClick={() => handleDelete(author.id)}
-                      className="p-1.5 text-gray-400 hover:text-red-600 transition-colors rounded-md hover:bg-red-50"
-                      title="Delete"
+                      className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+                      title="Delete Author"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
                 </td>
@@ -137,8 +140,10 @@ export default function Authors() {
             ))}
             {authors.length === 0 && (
               <tr>
-                <td colSpan="3" className="px-6 py-12 text-center text-gray-500 border-dashed">
-                  No authors found. Add an author to get started!
+                <td colSpan="3" className="px-8 py-20 text-center bg-gray-50/50 dark:bg-gray-800/20">
+                  <Users className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No authors found</h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-lg">Add an author to start attributing your books.</p>
                 </td>
               </tr>
             )}
@@ -147,63 +152,66 @@ export default function Authors() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <h3 className="text-lg font-medium text-gray-900">
-                {editingId ? 'Edit Author' : 'Add New Author'}
+        <div className="fixed inset-0 bg-gray-900/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-all">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden transform transition-all border dark:border-gray-800">
+            <div className="flex justify-between items-center p-6 sm:p-8 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {editingId ? 'Edit Author Details' : 'Add a New Author'}
               </h3>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-500">
-                <X className="w-5 h-5" />
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-full transition-colors shadow-sm border border-gray-200 dark:border-gray-700">
+                <X className="w-6 h-6" />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            
+            <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                  <label className="block text-base font-semibold text-gray-800 dark:text-gray-200 mb-2">First Name *</label>
                   <input
                     type="text"
                     required
                     value={formData.firstName}
                     onChange={e => setFormData({...formData, firstName: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-4 py-3.5 text-lg border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 dark:text-white"
                     placeholder="e.g. George"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                  <label className="block text-base font-semibold text-gray-800 dark:text-gray-200 mb-2">Last Name *</label>
                   <input
                     type="text"
                     required
                     value={formData.lastName}
                     onChange={e => setFormData({...formData, lastName: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-4 py-3.5 text-lg border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 dark:text-white"
                     placeholder="e.g. Orwell"
                   />
                 </div>
               </div>
+              
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <label className="block text-base font-semibold text-gray-800 dark:text-gray-200 mb-2">Email Address *</label>
                 <input
                   type="email"
                   required
                   value={formData.email}
                   onChange={e => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full px-4 py-3.5 text-lg border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 dark:text-white"
                   placeholder="e.g. george@example.com"
                 />
               </div>
-              <div className="pt-4 flex justify-end gap-3">
+              
+              <div className="pt-6 mt-6 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-4">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-6 py-3.5 text-base font-semibold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark"
+                  className="px-8 py-3.5 text-base font-semibold text-white bg-primary rounded-xl hover:bg-primary-dark shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
                   {editingId ? 'Save Changes' : 'Add Author'}
                 </button>
