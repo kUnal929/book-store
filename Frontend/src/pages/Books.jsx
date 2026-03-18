@@ -14,8 +14,11 @@ export default function Books() {
     authorId: ''
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const loadData = async () => {
     try {
+      setIsLoading(true);
       const [booksData, authorsData] = await Promise.all([
         fetchBooks(),
         fetchAuthors()
@@ -24,6 +27,8 @@ export default function Books() {
       setAuthors(authorsData);
     } catch (error) {
       console.error('Error loading data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -140,7 +145,12 @@ export default function Books() {
             </div>
           </div>
         ))}
-        {books.length === 0 && (
+        {isLoading && (
+          <div className="col-span-full py-20 px-6 flex justify-center items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+          </div>
+        )}
+        {!isLoading && books.length === 0 && (
           <div className="col-span-full py-20 px-6 text-center bg-gray-50/50 dark:bg-gray-800/20 border-2 border-gray-200 dark:border-gray-800 border-dashed rounded-3xl">
             <BookOpen className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Your library is empty</h3>

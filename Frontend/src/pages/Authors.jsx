@@ -13,12 +13,17 @@ export default function Authors() {
     email: ''
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   const loadData = async () => {
     try {
+      setIsLoading(true);
       const data = await fetchAuthors();
       setAuthors(data);
     } catch (error) {
       console.error('Error loading authors:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -138,7 +143,16 @@ export default function Authors() {
                 </td>
               </tr>
             ))}
-            {authors.length === 0 && (
+            {isLoading && (
+              <tr>
+                <td colSpan="3" className="px-8 py-20">
+                  <div className="flex justify-center items-center">
+                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
+                  </div>
+                </td>
+              </tr>
+            )}
+            {!isLoading && authors.length === 0 && (
               <tr>
                 <td colSpan="3" className="px-8 py-20 text-center bg-gray-50/50 dark:bg-gray-800/20">
                   <Users className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
