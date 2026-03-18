@@ -1,8 +1,14 @@
-import { appendFileSync } from 'fs';
+const loggerMiddleware = (req, res, next) => {
+  const startedAt = Date.now();
 
-const Loggermiddleware = (req, res, next) => {
-    const log = `\n [${Date.now()}] ${req.method}, ${req.url};`
-    appendFileSync('entry.txt', log, 'utf-8');
-    next();
+  res.on('finish', () => {
+    const duration = Date.now() - startedAt;
+    console.log(
+      `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`
+    );
+  });
+
+  next();
 };
-export default Loggermiddleware;
+
+export default loggerMiddleware;

@@ -3,22 +3,18 @@
 import express from 'express';
 import {
   getAllBooks,
-  getbookById,
+  getBookById,
   addBook,
-  DeleteBook,
-  CheckNumber
+  updateBook,
+  deleteBook
 } from '../controller/books.controller.js';
 
 const router = express.Router();
 
-router.get("/books", getAllBooks);
-
-router.get('/books/:id', getbookById);
-
-router.post("/books", addBook);
-
-router.delete('/books/:id', DeleteBook);
-
-router.post("/check-number", CheckNumber);
+router.get('/', getAllBooks);
+router.get('/:id', getBookById);
+router.post('/', addBook);
+router.put('/:id', updateBook);
+router.delete('/:id', deleteBook);
 
 export default router;

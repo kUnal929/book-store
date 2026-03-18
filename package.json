@@ -3,12 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "keywords": [],
+  "keywords": [
+    "nodejs",
+    "express",
+    "postgresql",
+    "drizzle",
+    "rest-api"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "REST API for managing books and authors with Express and PostgreSQL.",
   "type": "module",
   "dependencies": {
     "@types/node": "^24.3.1",

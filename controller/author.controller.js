@@ -1,71 +1,176 @@
 import { authorsTable } from "../models/author.model.js";
-import { booksTable } from "../models/book.model.js";
 import { db } from "../db/index.js";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { isNonEmptyString, isValidEmail, isValidUUID } from "../utils/validators.js";
 
 
 export async function getAuthors(req, res) {
-    const authors = await db.select().from(authorsTable)
+  try {
+    const authors = await db.select().from(authorsTable);
     return res.json(authors);
+  } catch (error) {
+    console.error("Error fetching authors:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 }
 
 export async function getAuthorByID(req, res) {
-    try {
-        const id = req.params.id.trim();
-    const author = await db.select()
-    .from(authorsTable)
-    .where((table) => eq(table.id, id)) 
-    // .leftJoin(booksTable, eq(booksTable.authorId, authorsTable.id))
-    .limit(1);
-        
-        if (author && author.length > 0) {
-            res.json(author[0]);
-        }
-        else {
-            res.status(404).json({ message: "Author not found" });
-        }
-    } catch (error) {
-        console.error("Error fetching author:", error);
+  try {
+    const id = req.params.id.trim();
 
+    if (!isValidUUID(id)) {
+      return res.status(400).json({ message: "Invalid author id" });
     }
+
+    const author = await db
+      .select()
+      .from(authorsTable)
+      .where(eq(authorsTable.id, id))
+      .limit(1);
+
+    if (author && author.length > 0) {
+      return res.json(author[0]);
+    }
+
+    return res.status(404).json({ message: "Author not found" });
+  } catch (error) {
+    console.error("Error fetching author:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 }
 
 export async function addAuthor(req, res) {
-    try {
-        const { firstName, lastName, email } = req.body;
+  try {
+    const { firstName, lastName, email } = req.body;
 
-    if (!firstName || firstName === "") {
-        return res.status(400).json({ error: 'First Name is required' });
+    if (!isNonEmptyString(firstName)) {
+      return res.status(400).json({ message: "First name is required" });
     }
-    else if (!lastName || lastName === "") {
-        return res.status(400).json({ error: 'Last Name is required' });
-    }
-    else if (!email || email === "") {
-        return res.status(400).json({ error: 'Email is required' });
-    }
-    const [result] = await db.insert(authorsTable).values({
-        firstName,
-        lastName,
-        email
-    })
-        .returning({ id: authorsTable.id })
-    return res.status(201).json({ message: 'Author added successfully', result });
 
-        
-    } catch (error) {
-        res.status(500).json({ message: "server error" });
+    if (!isNonEmptyString(lastName)) {
+      return res.status(400).json({ message: "Last name is required" });
     }
-    
+
+    if (!isNonEmptyString(email)) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "Enter a valid email address" });
+    }
+
+    const [result] = await db
+      .insert(authorsTable)
+      .values({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim().toLowerCase()
+      })
+      .returning();
+
+    return res.status(201).json({
+      message: "Author added successfully",
+      author: result
+    });
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    console.error("Error adding author:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 }
 
-// export async function DeleteAuthor(req, res) {
-//    try {
-//        const id =  req.params.id;
-//        const [result] = await db.delete(authorsTable).where(eq(authorsTable.id, id));
-//        return res.status(200).json({ message: 'Author deleted successfully' });
-    
-//    } catch (error) {
-//          console.error("Error deleting author:", error);
-//    }
-    
-// }
+export async function updateAuthor(req, res) {
+  try {
+    const id = req.params.id.trim();
+    const { firstName, lastName, email } = req.body;
+
+    if (!isValidUUID(id)) {
+      return res.status(400).json({ message: "Invalid author id" });
+    }
+
+    const updates = {};
+
+    if (firstName !== undefined) {
+      if (!isNonEmptyString(firstName)) {
+        return res.status(400).json({ message: "First name cannot be empty" });
+      }
+      updates.firstName = firstName.trim();
+    }
+
+    if (lastName !== undefined) {
+      if (!isNonEmptyString(lastName)) {
+        return res.status(400).json({ message: "Last name cannot be empty" });
+      }
+      updates.lastName = lastName.trim();
+    }
+
+    if (email !== undefined) {
+      if (!isNonEmptyString(email)) {
+        return res.status(400).json({ message: "Email cannot be empty" });
+      }
+      if (!isValidEmail(email)) {
+        return res.status(400).json({ message: "Enter a valid email address" });
+      }
+      updates.email = email.trim().toLowerCase();
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "Provide at least one field to update" });
+    }
+
+    const [updatedAuthor] = await db
+      .update(authorsTable)
+      .set(updates)
+      .where(eq(authorsTable.id, id))
+      .returning();
+
+    if (!updatedAuthor) {
+      return res.status(404).json({ message: "Author not found" });
+    }
+
+    return res.json({
+      message: "Author updated successfully",
+      author: updatedAuthor
+    });
+  } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+
+    console.error("Error updating author:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function deleteAuthor(req, res) {
+  try {
+    const id = req.params.id.trim();
+
+    if (!isValidUUID(id)) {
+      return res.status(400).json({ message: "Invalid author id" });
+    }
+
+    const [deletedAuthor] = await db
+      .delete(authorsTable)
+      .where(eq(authorsTable.id, id))
+      .returning();
+
+    if (!deletedAuthor) {
+      return res.status(404).json({ message: "Author not found" });
+    }
+
+    return res.json({ message: "Author deleted successfully" });
+  } catch (error) {
+    if (error.code === "23503") {
+      return res.status(400).json({
+        message: "Cannot delete author while books are assigned to that author"
+      });
+    }
+
+    console.error("Error deleting author:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+}

@@ -1,2 +1,5 @@
 node_modules/
 .env
+entry.txt
+npm-debug.log*
+api.md

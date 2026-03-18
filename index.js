@@ -1,19 +1,21 @@
 import 'dotenv/config';
 import express from 'express';
-import { db } from './db/index.js';
 import bookRouter from './router/book.router.js';
 import authorRouter from './router/author.router.js';
-import Loggermiddleware from './middleware/logger.js';
+import loggerMiddleware from './middleware/logger.js';
+import notFound from './middleware/notFound.js';
+
 const app = express();
-const port = 3000;
+const port = Number(process.env.PORT) || 3000;
 
-app.use(Loggermiddleware);
 app.use(express.json());
-app.use('/', bookRouter);
-app.use('/', authorRouter);
-
-
-
+app.use(loggerMiddleware);
+app.get('/', (req, res) => {
+  res.json({ message: 'Books Store API is running' });
+});
+app.use('/books', bookRouter);
+app.use('/authors', authorRouter);
+app.use(notFound);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
